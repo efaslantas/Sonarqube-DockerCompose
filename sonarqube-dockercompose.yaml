@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  sonarqube:
+    image: sonarqube:latest
+    container_name: sonarqube
+    hostname: sonarqube
+    command: -Dsonar.ce.javaOpts=-Xmx4096m -Dsonar.web.javaOpts=-Xmx4096m
+    expose:
+      - 9000
+    user: "999"
+    ports:
+      - 9010:9000
+    networks:
+      - sonarnet
+    environment:
+    - sonar.jdbc.username=sonar
+    - sonar.jdbc.password=Sonar123!
+    - sonar.jdbc.url=jdbc:postgresql://db/sonar
+
+    volumes:
+      - ./data/logs:/opt/sonarqube/logs
+      - ./data/data:/opt/sonarqube/data
+      - ./data/extensions:/opt/sonarqube/extensions
+  db:
+    image: postgres:12.0
+    container_name: sonarqube-pg
+    hostname: sonarqube-pg
+    networks:
+      - sonarnet
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=Sonar123!
+    volumes:
+      - ./data/postgres:/var/lib/postgresql
+      - ./data/postgres/data:/var/lib/postgresql/data
+
+networks:
+  sonarnet:
+
